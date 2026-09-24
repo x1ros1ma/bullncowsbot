@@ -8,7 +8,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 
-API_TOKEN = '8887345234:AAHdutf6-R_OIi5TyTbKCFXGXeeAqeetkXU'
+# Токен от @BotFather
+API_TOKEN = 'ВСТАВЬ_СЮДА_ТОКЕН_ОТ_BOTFATHER'
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -60,15 +61,14 @@ async def start_game(message: types.Message, state: FSMContext):
     await state.update_data(possible=ALL_NUMBERS.copy())
     
     text = (
-        "🎮 **Бот для обыгровки Цифрового батла**\n\n"
-        "1. Сделай первый ход в игре: `1234`\n"
-        "2. Отправь мне результат в формате: `ход есть место`\n"
-        "   *(Пример ввода: `1234 2 1`)*\n\n"
+        "🎮 <b>Бот для обыгровки Цифрового батла</b>\n\n"
+        "1. Сделай первый ход в игре: <code>1234</code>\n"
+        "2. Отправь мне результат в формате: <code>ход есть место</code>\n"
+        "   <i>Пример ввода: <code>1234 2 1</code></i>\n\n"
         "Для сброса игры напиши /reset"
     )
     
-    await message.answer(text, parse_mode="Markdown")
-    
+    await message.answer(text, parse_mode="HTML")
 
 @dp.message(GameState.playing)
 async def process_filter(message: types.Message, state: FSMContext):
@@ -79,7 +79,7 @@ async def process_filter(message: types.Message, state: FSMContext):
         guess = guess.zfill(4)
         if len(guess) != 4 or not (0 <= total <= 4) or not (0 <= place <= 4): raise ValueError
     except ValueError:
-        await message.answer("⚠️ Вводи так: `число есть место`\n*(Пример: `1234 2 1`)*", parse_mode="Markdown")
+        await message.answer("⚠️ Вводи так: <code>число есть место</code>\n<i>Пример: <code>1234 2 1</code></i>", parse_mode="HTML")
         return
 
     data = await state.get_data()
@@ -88,24 +88,23 @@ async def process_filter(message: types.Message, state: FSMContext):
     await state.update_data(possible=new_possible)
 
     if len(new_possible) == 0:
-        await message.answer("❌ **Ошибка!** Осталось 0 вариантов. Проверь данные или напиши /reset.", parse_mode="Markdown")
+        await message.answer("❌ <b>Ошибка!</b> Осталось 0 вариантов. Проверь данные или напиши /reset.", parse_mode="HTML")
         return
     if len(new_possible) == 1:
-        await message.answer(f"🎉 **ФИНАЛ! Загаданное число:** `{new_possible[0]}`", parse_mode="Markdown")
+        await message.answer(f"🎉 <b>ФИНАЛ! Загаданное число:</b> <code>{new_possible[0]}</code>", parse_mode="HTML")
         return
 
-    msg = await message.answer("🧠 *Считаю оптимальный ход...*", parse_mode="Markdown")
+    msg = await message.answer("🧠 <i>Считаю оптимальный ход...</i>", parse_mode="HTML")
     best_move = get_best_move(new_possible)
     is_candidate = "из кандидатов" if best_move in new_possible else "РАЗВЕДКА!"
     
     await msg.edit_text(
-        f"📊 **Осталось вариантов:** {len(new_possible)}\n"
-        f"💡 **Следующий ход:** `{best_move}` _({is_candidate})_\n\n"
-        f"Ответь мне в формате:\n`{best_move} ЕСТЬ МЕСТО`",
-        parse_mode="Markdown"
+        f"📊 <b>Осталось вариантов:</b> {len(new_possible)}\n"
+        f"💡 <b>Следующий ход:</b> <code>{best_move}</code> <i>({is_candidate})</i>\n\n"
+        f"Ответь мне в формате:\n<code>{best_move} ЕСТЬ МЕСТО</code>",
+        parse_mode="HTML"
     )
 
-# Микро-сервер для заглушки
 async def handle(request):
     return web.Response(text="Bot is running!")
 
@@ -118,7 +117,6 @@ async def main():
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
     
-    # Запуск бота Telegram
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
