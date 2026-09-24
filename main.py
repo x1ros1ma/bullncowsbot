@@ -59,7 +59,7 @@ async def start_game(message: types.Message, state: FSMContext):
     await state.set_state(GameState.playing)
     await state.update_data(possible=ALL_NUMBERS.copy())
     text = (
-        "🎮 **Бот для обыгровки "Цифрового батла"**\n\n"
+        "🎮 **Бот для обыгровки "Цифрового баттла"`\n"
         "1. Сделай первый ход в игре: `1234`\n"
         "2. Отправь мне результат в формате: `ход есть место`\n"
         "   *(Например: 1234 2 1)*\n\n"
