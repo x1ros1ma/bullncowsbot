@@ -59,15 +59,16 @@ async def start_game(message: types.Message, state: FSMContext):
     await state.set_state(GameState.playing)
     await state.update_data(possible=ALL_NUMBERS.copy())
     
-    lines = [
-        "🎮 **Бот для обыгровки Цифрового батла**\n",
-        "1. Сделай первый ход в игре: `1234`",
-        "2. Отправь мне результат в формате: `ход есть место`",
-        "   *(Например: `1234 2 1`)*\n",
+    text = (
+        "🎮 **Бот для обыгровки Цифрового батла**\n\n"
+        "1. Сделай первый ход в игре: `1234`\n"
+        "2. Отправь мне результат в формате: `ход есть место`\n"
+        "   *(Пример ввода: `1234 2 1`)*\n\n"
         "Для сброса игры напиши /reset"
-    ]
+    )
     
-    await message.answer("\n".join(lines), parse_mode="Markdown")
+    await message.answer(text, parse_mode="Markdown")
+    
 
 @dp.message(GameState.playing)
 async def process_filter(message: types.Message, state: FSMContext):
@@ -78,7 +79,7 @@ async def process_filter(message: types.Message, state: FSMContext):
         guess = guess.zfill(4)
         if len(guess) != 4 or not (0 <= total <= 4) or not (0 <= place <= 4): raise ValueError
     except ValueError:
-        await message.answer("⚠️ Вводи так: `число есть место` (Пример: `1234 2 1`)", parse_mode="Markdown")
+        await message.answer("⚠️ Вводи так: `число есть место`\n*(Пример: `1234 2 1`)*", parse_mode="Markdown")
         return
 
     data = await state.get_data()
@@ -87,17 +88,20 @@ async def process_filter(message: types.Message, state: FSMContext):
     await state.update_data(possible=new_possible)
 
     if len(new_possible) == 0:
-        await message.answer("❌ Ошибка! Осталось 0 вариантов. Напиши /reset.")
+        await message.answer("❌ **Ошибка!** Осталось 0 вариантов. Проверь данные или напиши /reset.", parse_mode="Markdown")
         return
     if len(new_possible) == 1:
-        await message.answer(f"🎉 **ФИНАЛ! Число:** `{new_possible[0]}`", parse_mode="Markdown")
+        await message.answer(f"🎉 **ФИНАЛ! Загаданное число:** `{new_possible[0]}`", parse_mode="Markdown")
         return
 
-    msg = await message.answer("🧠 *Считаю ход...*", parse_mode="Markdown")
+    msg = await message.answer("🧠 *Считаю оптимальный ход...*", parse_mode="Markdown")
     best_move = get_best_move(new_possible)
     is_candidate = "из кандидатов" if best_move in new_possible else "РАЗВЕДКА!"
+    
     await msg.edit_text(
-        f"📊 **Осталось:** {len(new_possible)}\n💡 **Ход:** `{best_move}` _({is_candidate})_\n\nОтветь: `{best_move} ЕСТЬ МЕСТО`",
+        f"📊 **Осталось вариантов:** {len(new_possible)}\n"
+        f"💡 **Следующий ход:** `{best_move}` _({is_candidate})_\n\n"
+        f"Ответь мне в формате:\n`{best_move} ЕСТЬ МЕСТО`",
         parse_mode="Markdown"
     )
 
