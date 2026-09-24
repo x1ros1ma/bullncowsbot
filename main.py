@@ -9,7 +9,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 
 # Токен от @BotFather
-API_TOKEN = 'ВСТАВЬ_СЮДА_ТОКЕН_ОТ_BOTFATHER'
+API_TOKEN = '8887345234:AAHdutf6-R_OIi5TyTbKCFXGXeeAqeetkXU'
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
